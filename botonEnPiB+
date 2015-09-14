@@ -1,0 +1,64 @@
+.section .init
+.globl _start
+_start:
+
+b main
+.section .text
+
+main:
+	mov sp, #0x8000
+
+	mov r0, #14
+	mov r1, #0
+	bl SetGpioFunction
+	
+	mov r0, #7
+	mov r1, #1
+	bl SetGpioFunction
+	
+	inicio:
+		mov r7, #0
+		bl checkButton
+			
+		cmp r7, #1
+		bne encendido
+		beq noHacer
+
+		encendido:
+			bl encenderLED
+			b inicio
+		
+		noHacer:
+			bl apagarLED
+			b inicio
+
+			
+.globl encenderLED
+encenderLED:
+		push {lr}
+		mov r0, #7
+		mov r1, #1
+		bl SetGpio
+		pop {pc}
+		
+.globl checkButton		
+checkButton:
+		push {lr}
+		bl GetGpioAddress
+		mov r4,r0
+		ldr r5,[r4,#0x34]
+		mov r0,#1
+		lsl r0,#14
+		and r5,r0
+		teq r5,#0
+		movne r7, #1
+		pop {pc}
+
+.globl apagarLED
+apagarLED: 
+		push {lr}
+		mov r0, #7
+		mov r1, #0
+		bl SetGpio
+		pop {pc}
+
