@@ -21,8 +21,8 @@ main:
 		bl checkButton
 			
 		cmp r7, #1
-		bne encendido
-		beq noHacer
+		beq encendido
+		bne noHacer
 
 		encendido:
 			bl encenderLED
@@ -56,7 +56,7 @@ checkButton:
 		lsl r0,#14
 		and r5,r0
 		teq r5,#0
-		movne r7, #1
+		moveq r7, #1
 		pop {pc}
 
 .globl apagarLED
