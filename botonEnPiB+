@@ -32,7 +32,12 @@ main:
 			bl apagarLED
 			b inicio
 
-			
+
+/*
+* ESTO SE COPIA EN EL ARCHIVO GPIO.S
+*/
+
+
 .globl encenderLED
 encenderLED:
 		push {lr}
