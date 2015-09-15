@@ -1,0 +1,14 @@
+#devuelve en r0 cual de los botones fue presionados como 1,2,3 o 4
+	respBoton:
+		push {lr}
+		cmp r14, #0
+		beq ldr r0, #1
+		cmp r15, #0
+		beq ldr r0, #2
+		cmp r18, #0
+		beq ldr r0, #3
+		cmp r23, #0
+		beq ldr r0, #4
+		pop {pc}
+		
+		
