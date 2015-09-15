@@ -1,0 +1,123 @@
+.section .init
+.globl _start
+_start:
+
+b main
+
+.macro SetPin puerto, valor
+	mov r0, \puerto
+	mov r1, \valor
+	bl SetGpioFunction
+.endm
+
+
+.macro TurnLed puerto, valor
+	mov r0, \puerto
+	mov r1, \valor
+	bl SetGpio
+.endm
+
+.section .text
+
+main:
+	mov sp, #0x8000
+
+	SetPin #14, #0
+	SetPin #15, #0
+	SetPin #18, #0
+	SetPin #23, #0
+
+	SetPin #21, #1
+	SetPin #20, #1
+	SetPin #16, #1
+	SetPin #12, #1
+	
+	
+	pruebaMacros:
+		/*
+		*mov r0, #14
+		*bl comprobarBoton
+		*cmp r7, #1
+		*bne fin
+		*/
+		/*
+		*bl random
+		*bl comprobarRandom
+		*/
+		
+		/*
+		* Jala vector
+		*/
+		ldr r5, = patron
+		ldr r6, [r5], #4
+		ldr r0, =1000000
+		bl Wait
+		/*
+		*numero de pin (debe ser variable)
+		*/
+		mov r0, #14
+		bl comprobarBoton
+		cmp r7, #1
+		bne led4
+		beq led1
+		b pruebaMacros
+		
+	comprobarRandom:
+		push {lr}
+		cmp r0, #0
+		bleq led1
+		cmp r0, #1
+		bleq led2
+		cmp r0, #2
+		bleq led3
+		cmp r0, #3
+		bleq led4
+		pop {pc}
+	led1:
+		push {lr}
+		TurnLed #21, #1
+		ldr r0, = 500000
+		bl Wait
+		pop {pc}
+	led2:
+		push {lr}
+		TurnLed #20, #1
+		ldr r0, = 500000
+		bl Wait
+		pop {pc}
+	led3:
+		push {lr}
+		TurnLed #16, #1
+		ldr r0, = 500000
+		bl Wait
+		pop {pc}
+	led4:
+		push {lr}
+		TurnLed #12, #1
+		ldr r0, = 500000
+		bl Wait
+		pop {pc}
+	random:
+		push {lr}
+		bl GetTimeStamp
+		and r0,#3
+		pop {pc}
+		
+	comprobarBoton:
+		push {lr}
+		mov r6, r0
+		bl GetGpioAddress
+		mov r4,r0
+		ldr r5,[r4,#0x34]
+		mov r0,#1
+		lsl r0,r6
+		and r5,r0
+		teq r5,#0
+		movne r7, #1
+		pop {pc}
+		
+.section .data
+.align 2
+
+patron:
+.word 1,2,3,4
