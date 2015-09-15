@@ -19,9 +19,9 @@ b main
 * Macro para encender o apagar un led
 * Utiliza la funcion SetGpio
 * puerto = cualquier puerto de salida
-* valor = 1 o 0
+* valor = 1 if HIGH; 0 if LOW
 */
-.macro SetLed puerto, valor
+.macro TurnLed puerto, valor
 	mov r0, \puerto
 	mov r1, \valor
 	bl SetGpio
@@ -42,69 +42,103 @@ main:
 	*5 entrada: 5 boton
 	*/
 	
-	SetPin #7, #1
-	SetPin #8, #1
-	SetPin #9, #1
-	SetPin #10, #1
-	SetPin #11, #1
-	SetPin #12, #1
-	SetPin #13, #1
-	SetPin #14, #1
-	SetPin #15, #1
-	SetPin #16, #1
-	SetPin #17, #1
-	SetPin #18, #1
-	SetPin #19, #1
-	
-	SetPin #20, #0
-	SetPin #21, #0
-	SetPin #22, #0
+	/*
+	*Botones:
+	*	1: pin 14
+	*	2: pin 15
+	*	3: pin 18
+	*	4: pin 23
+	*/
+	SetPin #14, #0
+	SetPin #15, #0
+	SetPin #18, #0
 	SetPin #23, #0
-	SetPin #24, #0
+	
+	/*
+	*LEDS:
+	*	1: pin 21
+	*	2: pin 20
+	*	3: pin 16
+	*	4: pin 12
+	*/
+	SetPin #21, #1
+	SetPin #20, #1
+	SetPin #16, #1
+	SetPin #12, #1
 	
 	inicioDelJuego:
 		/*jalar random*/
 		/* ro = random*/
+		bl random
 		bl comprobarRandom
 		bl comprobarBoton
 		
 		
 		
 		
-		
-		
-		
-		
-		
-		
+	/*
+	* Subrutina que genera un numero aleatorio entre 0 y 3.
+	* Salida: r0 = numero aleatorio.
+	*/
+	random:
+		push {lr}
+		bl GetTimeStamp
+		and r0,#3
+		pop {pc}
+
 	/*
 	* Subrutina para ver cual es el numero aleatorio, para adherirlo a un numero de led
 	* Entrada: r0 = numero aleatorio
 	* Salida: r0 = numeroDePin
 	* Numero y pin(led):
-	*	0: LED 1, pin #7
-	*	1: LED 2, pin #8
-	*	2: LED 3, pin #9
-	*	3: LED 4, pin #10
+	*	0: LED 1, pin #21
+	*	1: LED 2, pin #20
+	*	2: LED 3, pin #16
+	*	3: LED 4, pin #12
 	comprobarRandom:
 		push {lr}
 		cmp r0, #0
-		SetLedeq #7, #0
-		moveq r0, #7
+		bleq led1
 		cmp r0, #1
-		SetLedeq #8, #0
-		moveq r0, #8
+		bleq led2
 		cmp r0, #2
-		SetLedeq #9, #0
-		moveq r0, #9
+		bleq led3
 		cmp r0, #3
-		SetLedeq #10, #0
-		moveq r0, #10
+		bleq led4
+		pop {pc}
+		
+	/*
+	* Subrutinas para encender cada LED. Sirven para cuando se salta desde comprobar Random
+	*/
+	led1:
+		push {lr}
+		TurnLed #21, #1
+		ldr r0, = 500000
+		bl Wait
+		pop {pc}
+	led2:
+		push {lr}
+		TurnLed #20, #1
+		ldr r0, = 500000
+		bl Wait
+		pop {pc}
+	led3:
+		push {lr}
+		TurnLed #16, #1
+		ldr r0, = 500000
+		bl Wait
+		pop {pc}
+	led4:
+		push {lr}
+		TurnLed #12, #1
+		ldr r0, = 500000
+		bl Wait
 		pop {pc}
 		
 	/*
 	* Subrutina para verificar que se presiona el boton indicado, segun el numero de led encendido
-	* Entrada: r0 = numero de pin
+	* Entrada: r0 = numero de pin. (Determina el lsl y )
+	* Salida: r0 = 1 if HIGH
 	*/
 	comprobarBoton:
 		push {lr}
@@ -113,17 +147,39 @@ main:
 		mov r4, r0
 		ldr r5, [r4, #0x34]
 		mov r0,#1
-		lsl r0,#14
+		lsl r0,r6
 		and r5,r0
-		teq r5, 
-		/*AQui hace falta ver puerto*/
+		teq r5, #0
+		moveq r0, #1
 		bne error
 		pop {pc}
 		
+	/*
+	* Subrutina para emitir un parpadeo de LEDS para informar al usuario que ha ingresado un patron incorrecto.
+	*/
 	error:
-	/*Que todos los leds parpadeen y se regresa a inicio*/
+		TurnLed #7, #1
+		TurnLed #8, #1
+		TurnLed #9, #1
+		TurnLed #10, #1
+		ldr r0, = 500000
+		bl Wait
+		TurnLed #7, #0
+		TurnLed #8, #0
+		TurnLed #9, #0
+		TurnLed #10, #0
+		ldr r0, = 1000000
+		bl Wait
 		
+		b inicioDelJuego
 		
 	
 	
+.section .data
+.align 2
+
+patron:
+.word 1,2,3,4
+	
+
 	
