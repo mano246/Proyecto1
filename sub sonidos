@@ -1,0 +1,68 @@
+	
+Sonido1:	
+	push {lr}
+	SetOutput #Rbocina, #1
+	ldr r0,=1911
+    bl Wait
+	
+	SetOutput #Rbocina, #0
+	ldr r0,=1911
+    bl Wait
+	
+	add r5, #1
+	ldr r6, =262
+	cmp r5, r6
+	ble	Sonido1
+	mov r5,#
+	pop {pc}
+
+Sonido2:
+	push {lr}
+	SetOutput #Rbocina, #1
+	ldr r0,=1703 
+    bl Wait
+	
+	SetOutput #Rbocina, #0
+	ldr r0,=1703
+    bl Wait
+	
+	add r5, #1
+	ldr r6, =294
+	cmp r5, r6
+	ble	Sonido2
+	mov r5,#0
+	pop {pc}
+
+Sonido3: 
+	push {lr}
+	SetOutput #Rbocina, #1
+	ldr r0,=1517 
+    bl Wait
+	
+	SetOutput #Rbocina, #0
+	ldr r0,=1517
+    bl Wait
+	
+	add r5, #1
+	ldr r6, =330
+	cmp r5, r6
+	ble	Sonido3
+	mov r5,#0
+	pop {pc}
+
+Sonido4:
+	push {lr}
+	SetOutput #Rbocina, #1
+	ldr r0,=1452
+    bl Wait
+	
+	SetOutput #Rbocina, #0
+	ldr r0,=1452
+    bl Wait
+	
+	add r5, #1
+	ldr r6, =344
+	cmp r5, r6
+	ble	Sonido4
+	mov r5,#0
+	pop {pc}
