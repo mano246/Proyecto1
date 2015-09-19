@@ -1,0 +1,99 @@
+.section .init
+.globl _start
+_start:
+
+b main
+
+.macro SetPin puerto, valor
+	mov r0, \puerto
+	mov r1, \valor
+	bl SetGpioFunction
+.endm
+
+
+.macro TurnLed puerto, valor
+	mov r0, \puerto
+	mov r1, \valor
+	bl SetGpio
+.endm
+
+.section .text
+
+main:
+	mov sp, #0x8000
+
+	SetPin #14, #0
+	SetPin #15, #0
+	SetPin #18, #0
+	SetPin #23, #0
+
+	SetPin #21, #1
+	SetPin #20, #1
+	SetPin #16, #1
+	SetPin #12, #1
+	SetPin #26, #1
+	
+	mov r10, #0
+	
+	pruebaMacros:
+		mov r1, #4
+		mov r2, #14
+		bl comprobarBoton
+		
+		cmp r5, #0
+		bleq led5
+		b pruebaMacros
+	
+	
+	led5:
+		push {lr}
+		TurnLed #26, #1
+		ldr r0, = 500000
+		bl Wait
+		TurnLed #26, #0
+		ldr r0, = 500000
+		bl Wait
+		pop {pc}
+	comprobarBoton:
+		push {lr}	
+		bl GetGpioAddress
+		mov r4,r0
+		ldr r5,[r4,#0x34]
+		mov r0,#1
+		lsl r0,#14
+		and r5,r0
+		teq r5,#0
+		bne finComprobarBoton       
+		beq comprobarBoton        /*Si el boton no ha sido presionado, no sale de la subrutina*/
+		
+		finComprobarBoton:
+			mov r5, #0
+			pop {pc}
+		
+	
+	error:
+		push {lr}
+		TurnLed #21, #1
+		TurnLed #20, #1
+		TurnLed #16, #1
+		TurnLed #12, #1
+		ldr r0, = 300000
+		bl Wait
+		TurnLed #21, #0
+		TurnLed #20, #0
+		TurnLed #16, #0
+		TurnLed #12, #0
+		ldr r0, = 300000
+		bl Wait
+		
+		pop {pc}
+		
+		
+.section .data
+.align 2
+
+patron:
+	.word 0,0,0,0,0
+	
+patron1:
+	.word 14,15,18,23
