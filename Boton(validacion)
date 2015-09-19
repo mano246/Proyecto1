@@ -70,6 +70,39 @@ main:
 			mov r5, #0
 			pop {pc}
 		
+	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@		
+	comprobarBoton2:
+		push {lr}
+			inicio:
+		mov r0,r2					@SE ENVIA EL NUMERO DE PUERTO A LEER
+		b GetGpio					@SE LLAMA A LA SUBRUTINA DE LECTURA 
+		cmp r0,#1					@SE COMPARA EL RESULTADO CON 1
+		moveq r0,#16					@SI ES IGUAL SE ENCIENDE LLAMA
+		bleq inicio					@A LA SUBRUTINA DE comprobarBoton2
+								@CICLO INFINITO 
+			fin:
+		pop {pc}
+		
+	@por si no lo tenes aqui esta el getgpio	
+	GetGpio:
+	push {lr}				@SE ALMACENA EL LINK REGISTER EN PILA
+	MOV R1,R0				@SE MUEVE EL NUMERO DE PUERTO A R1
+	NumPuerto .req R1
+	bl GetGpioAddress		@SE OBTIENE LA DIRECCION DEL GPIO 
+	GpioAddress .req R0
+	LDR R2, [R0,#0x34]		@SE OBTIENE EL CONTENIDO DE LA DIRECCION DESEADA 
+	.unreq GpioAddress
+	MOV R0,#1				
+	LSL R0, NumPuerto		@SE MUEVE UN 1 AL BIT CORRESPONDIENTE AL # DE PUERTO 
+	.unreq NumPuerto
+	AND R2, R0				@SE REALIZA UN AND LOGICO PARA DETERMINAR SI HAY UN 1 O UN 0 
+	TEQ R2,#0				@SE REALIZA UN TEST AL REGISTRO CON EL RESULTADO 
+	MOVEQ R0,#0				@SI ES 0 SE ENVIA UN 0 A RO
+	MOVNE R0,#1				@SI ES 1 SE ENVIA UN 1 A RO 
+	POP {PC} 
+	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@		
+
+		
 	
 	error:
 		push {lr}
