@@ -17,6 +17,13 @@ b main
 	bl SetGpio
 .endm
 
+.macro TurnSpeaker puerto, valor
+	mov r0, \puerto
+	mov r1, \valor
+	bl SetGpio
+.endm
+
+
 .macro stateButton puerto
 	ldr r5, [r4, #0x34]
 	mov r0, #1
@@ -36,6 +43,7 @@ main:
 	SetPin #15, #0
 	SetPin #18, #0
 	SetPin #23, #0
+	
 
 	SetPin #21, #1
 	SetPin #20, #1
@@ -43,11 +51,11 @@ main:
 	SetPin #12, #1
 	SetPin #26, #1
 	SetPin #19, #1
+	SetPin #13, #1
 	
 	mov r10, #0
 	
 	pruebaMacros:
-		
 		bl nuevoNivel
 		
 		bl random
@@ -140,6 +148,7 @@ main:
 		bl storeListL
 		
 		TurnLed #21, #1
+		bl sound1
 		ldr r0, = 500000
 		bl Wait
 		TurnLed #21, #0
@@ -154,6 +163,7 @@ main:
 		bl storeListL
 	
 		TurnLed #20, #1
+		bl sound2
 		ldr r0, = 500000
 		bl Wait
 		TurnLed #20, #0
@@ -168,6 +178,7 @@ main:
 		bl storeListL
 		
 		TurnLed #16, #1
+		bl sound3
 		ldr r0, = 500000
 		bl Wait
 		TurnLed #16, #0
@@ -182,6 +193,7 @@ main:
 		bl storeListL
 		
 		TurnLed #12, #1
+		bl sound4
 		ldr r0, = 500000
 		bl Wait
 		TurnLed #12, #0
@@ -203,6 +215,74 @@ main:
 		ldr r0, = 500000
 		bl Wait
 		TurnLed #19, #0
+		pop {pc}
+	
+	sound1: 
+		push {lr}
+		TurnSpeaker #13, #1
+		ldr r0, = 1911
+		bl Wait
+		
+		TurnSpeaker #13, #0
+		ldr r0, = 1911
+		bl Wait
+		
+		add r5, #1
+		ldr r6, =75
+		cmp r5, r6
+		ble	sound1
+		mov r5,#0
+		pop {pc}
+		
+	sound2:
+		push {lr}
+		TurnSpeaker #13, #1
+		ldr r0, = 1703
+		bl Wait
+		
+		TurnSpeaker #13, #0
+		ldr r0, = 1703
+		bl Wait
+		
+		add r5, #1
+		ldr r6, =75
+		cmp r5, r6
+		ble	sound2
+		mov r5,#0
+		pop {pc}
+		
+	sound3:
+		push {lr}
+		TurnSpeaker #13, #1
+		ldr r0, = 1517
+		bl Wait
+		
+		TurnSpeaker #13, #0
+		ldr r0, = 1517
+		bl Wait
+		
+		add r5, #1
+		ldr r6, =75
+		cmp r5, r6
+		ble	sound3
+		mov r5,#0
+		pop {pc}
+		
+	sound4:
+		push {lr}
+		TurnSpeaker #13, #1
+		ldr r0, = 1452
+		bl Wait
+		
+		TurnSpeaker #13, #0
+		ldr r0, = 1452
+		bl Wait
+		
+		add r5, #1
+		ldr r6, =75
+		cmp r5, r6
+		ble	sound4
+		mov r5,#0
 		pop {pc}
 		
 	storeListL:
@@ -332,6 +412,3 @@ patronL:
 	
 patronB:
 	.word 0,0,0,0,0
-
-temp:
-	.int 21,21,21,21
