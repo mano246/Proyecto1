@@ -1,0 +1,7 @@
+subirNivel:
+	push {lr}
+	add r2,#1
+	cmp r2,#10
+	beq mov r2,#0
+	beq add r3,#1
+	pop {pc}
