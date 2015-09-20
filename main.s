@@ -42,6 +42,7 @@ main:
 	SetPin #16, #1
 	SetPin #12, #1
 	SetPin #26, #1
+	SetPin #19, #1
 	
 	mov r10, #0
 	
@@ -95,29 +96,27 @@ main:
 				bl led5
 				cmp r9, #20
 				bne ciclo
-				/*beq pasarTurno*/
-				beq pruebaMacros
+				moveq r11, #4
+				beq pasarTurno
 		
-		/*		
-		*mov r11, #4
-		*pasarTurno:
-		*	bl verificarPatron
-		*	add r11, #4
-		*	cmp r11, #24
-		*	bne pasarTurno
-		*	beq pruebaMacros
-		*/
+		pasarTurno:
+			bl verificarPatron
+			add r11, #4
+			cmp r11, #24
+			bne pasarTurno
+			beq pruebaMacros
+		
 			
 
 			
 	verificarPatron:
 		push {lr}
-		ldr r5, = patron
+		ldr r5, = patronL
 		ldr r6, [r5], r11
-		ldr r8, = temp
+		ldr r8, = patronB
 		ldr r9, [r8], r11
 		cmp r6, r9
-		bleq led5
+		bleq led6
 		b error
 		pop {pc}
 		
@@ -138,7 +137,7 @@ main:
 		push {lr}  /*r4 viene la posicion*/
 		
 		mov r6, #21
-		bl storeList
+		bl storeListL
 		
 		TurnLed #21, #1
 		ldr r0, = 500000
@@ -152,7 +151,7 @@ main:
 		push {lr}
 		
 		mov r6, #20
-		bl storeList
+		bl storeListL
 	
 		TurnLed #20, #1
 		ldr r0, = 500000
@@ -166,7 +165,7 @@ main:
 		push {lr}
 	
 		mov r6, #16
-		bl storeList
+		bl storeListL
 		
 		TurnLed #16, #1
 		ldr r0, = 500000
@@ -180,7 +179,7 @@ main:
 		push {lr}
 	
 		mov r6, #12
-		bl storeList
+		bl storeListL
 		
 		TurnLed #12, #1
 		ldr r0, = 500000
@@ -197,13 +196,35 @@ main:
 		bl Wait
 		TurnLed #26, #0
 		pop {pc}
+	
+	led6:
+		push {lr}
+		TurnLed #19, #1
+		ldr r0, = 500000
+		bl Wait
+		TurnLed #19, #0
+		pop {pc}
 		
-	storeList:
+	storeListL:
 		push {lr}
 		mov r5, r4
-		ldr r0, = patron
+		ldr r0, = patronL
 		str r6, [r0], r5
 		pop {pc}
+	
+	storeListButton: /* Entrada: r6 = pin, r5= numero de posicion*/
+		mov r5, #4
+		inicioStoreListButton:
+			push {lr}
+			ldr r0, = patronB
+			ldr r1, [r0], r5
+			cmp r1, #0 
+			addne r5, r5, #4
+			blne inicioStoreListButton
+			beq storeListB
+		storeListB:
+			str r6, [r0], r5
+			pop {pc}
 		
 	random:
 		push {lr}
@@ -219,21 +240,29 @@ main:
 		stateButton #15
 		cmp r0, #1
 		bleq led1
+		moveq r6, #21
+		bleq storeListButton 
 		bleq led5
 		
 		stateButton #14
 		cmp r0, #1
 		bleq led2
+		moveq r6, #20
+		bleq storeListButton 
 		bleq led5
 		
 		stateButton #18
 		cmp r0, #1
 		bleq led3
+		moveq r6, #16
+		bleq storeListButton 
 		bleq led5
 		
 		stateButton #23
 		cmp r0, #1
 		bleq led4
+		moveq r6, #12
+		bleq storeListButton 
 		bleq led5	
 		pop {pc}
 		
@@ -263,6 +292,7 @@ main:
 		ldr r0, = 300000
 		bl Wait
 		
+		TurnLed #19, #1
 		b pruebaMacros
 		
 	nuevoNivel:
@@ -297,11 +327,11 @@ main:
 .section .data
 .align 2
 
-patron:
+patronL:
 	.word 0,0,0,0,0
 	
-patron1:
-.word 21,21,21,21
+patronB:
+	.word 0,0,0,0,0
 
 temp:
-.int 21,21,21,21
+	.int 21,21,21,21
