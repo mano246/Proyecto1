@@ -293,7 +293,7 @@ main:
 		pop {pc}
 	
 	storeListButton: /* Entrada: r6 = pin, r5= numero de posicion*/
-		mov r5, #4
+		mov r5, #0
 		inicioStoreListButton:
 			push {lr}
 			ldr r0, = patronB
