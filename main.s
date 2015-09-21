@@ -59,6 +59,10 @@ main:
 		bl nuevoNivel
 		
 		bl random
+		mov r4, #0
+		bl comprobarRandom
+		
+		bl random
 		mov r4, #4
 		bl comprobarRandom
 		
@@ -72,10 +76,6 @@ main:
 		
 		bl random
 		mov r4, #16
-		bl comprobarRandom
-		
-		bl random
-		mov r4, #20
 		bl comprobarRandom
 		
 		
