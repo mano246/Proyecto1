@@ -109,8 +109,8 @@ main:
 		
 		pasarTurno:
 			bl verificarPatron
-			add r11, #4
-			cmp r11, #24
+			add r11, #0
+			cmp r11, #20
 			bne pasarTurno
 			beq pruebaMacros
 		
