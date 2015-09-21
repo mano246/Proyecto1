@@ -104,7 +104,7 @@ main:
 				bl led5
 				cmp r9, #20
 				bne ciclo
-				moveq r11, #4
+				moveq r11, #0
 				beq pasarTurno
 		
 		pasarTurno:
