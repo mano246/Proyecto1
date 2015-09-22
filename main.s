@@ -90,8 +90,6 @@ main:
 		beq finTurno
 		movne r10, #0
 		bne finTurno
-		
-		
 	
 		
 		finTurno:
@@ -108,31 +106,35 @@ main:
 				beq pasarTurno
 		
 		pasarTurno:
-			bl verificarPatron
-			add r11, #0
-			cmp r11, #20
-			bne pasarTurno
-			beq pruebaMacros
+			ldr r5, = patronL
+			ldr r8, = patronB
+			cicloPasarTurno: 
+				ldr r6, [r5], #4
+				ldr r9, [r8], #4
+				cmp r6, r9
+				bne error
+				bleq led6
+				add r11, #1
+				cmp r11, #4
+				bne cicloPasarTurno
+				beq pruebaMacros
 		
 			
-
-			
-	verificarPatron:
-		push {lr}
-		ldr r5, = patronL
-		ldr r6, [r5], r11
-		ldr r8, = patronB
-		ldr r9, [r8], r11
-		cmp r6, r9
-		bleq led6
-		b error
-		pop {pc}
-		
+	/*verificarPatron:
+	*	push {lr}		
+	*	ldr r6, [r5], #4
+	*	ldr r9, [r8], #4
+	*	cmp r6, r9
+	*	bleq led6
+	*	bne error
+	*	pop {pc}
+	*/
+	
 	comprobarRandom:
 		push {lr}
 		cmp r0, #0
 		bleq led1
-		cmp r0, #1
+		cmp r0, #1   /*aqui r0 ya se cambio*/
 		bleq led2
 		cmp r0, #2
 		bleq led3
@@ -144,7 +146,7 @@ main:
 	led1:
 		push {lr}  /*r4 viene la posicion*/
 		
-		mov r6, #21
+		mov r6, #1
 		bl storeListL
 		
 		TurnLed #21, #1
@@ -159,7 +161,7 @@ main:
 	led2:
 		push {lr}
 		
-		mov r6, #20
+		mov r6, #2
 		bl storeListL
 	
 		TurnLed #20, #1
@@ -174,7 +176,7 @@ main:
 	led3:
 		push {lr}
 	
-		mov r6, #16
+		mov r6, #3
 		bl storeListL
 		
 		TurnLed #16, #1
@@ -189,7 +191,7 @@ main:
 	led4:
 		push {lr}
 	
-		mov r6, #12
+		mov r6, #4
 		bl storeListL
 		
 		TurnLed #12, #1
@@ -215,6 +217,8 @@ main:
 		ldr r0, = 500000
 		bl Wait
 		TurnLed #19, #0
+		ldr r0, = 500000
+		bl Wait
 		pop {pc}
 	
 	sound1: 
@@ -293,17 +297,15 @@ main:
 		pop {pc}
 	
 	storeListButton: /* Entrada: r6 = pin, r5= numero de posicion*/
-		mov r5, #0
+		push {lr}
+		ldr r0, = patronB
 		inicioStoreListButton:
-			push {lr}
-			ldr r0, = patronB
-			ldr r1, [r0], r5
+			ldr r1, [r0], #4			/*llegar al final del arreglo, y comparar*/
 			cmp r1, #0 
-			addne r5, r5, #4
-			blne inicioStoreListButton
+			bne inicioStoreListButton
 			beq storeListB
 		storeListB:
-			str r6, [r0], r5
+			str r6, [r0]
 			pop {pc}
 		
 	random:
@@ -320,28 +322,28 @@ main:
 		stateButton #15
 		cmp r0, #1
 		bleq led1
-		moveq r6, #21
+		moveq r6, #1
 		bleq storeListButton 
 		bleq led5
 		
 		stateButton #14
 		cmp r0, #1
 		bleq led2
-		moveq r6, #20
+		moveq r6, #2
 		bleq storeListButton 
 		bleq led5
 		
 		stateButton #18
 		cmp r0, #1
 		bleq led3
-		moveq r6, #16
+		moveq r6, #3
 		bleq storeListButton 
 		bleq led5
 		
 		stateButton #23
 		cmp r0, #1
 		bleq led4
-		moveq r6, #12
+		moveq r6, #4
 		bleq storeListButton 
 		bleq led5	
 		pop {pc}
@@ -371,8 +373,12 @@ main:
 		TurnLed #12, #0
 		ldr r0, = 300000
 		bl Wait
-		
-		TurnLed #19, #1
+	
+		bl led5
+				
+		bl sound1
+		bl sound2
+		bl sound3
 		b pruebaMacros
 		
 	nuevoNivel:
@@ -401,6 +407,7 @@ main:
 		TurnLed #12, #0
 		ldr r0, = 300000
 		bl Wait
+
 		pop {pc}
 	
 		
