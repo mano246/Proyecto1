@@ -60,13 +60,10 @@ main:
 	
 	pruebaMacros:
 		
-		bl display1:
-		bl display2:
-
+		bl displayScore1
 		add r2,#1
 		cmp r2,#10
 		beq mov r2,#1
-		beq add r3,#1
 		
 		bl nuevoNivel
 		
@@ -421,6 +418,63 @@ main:
 		bl Wait
 
 		pop {pc}
+displayScore1:
+	push {lr}
+	cmp r2,#1
+	TurnLed #2, #1
+	TurnLed #3, #0
+	TurnLed #4, #0
+	TurnLed #17, #0
+	
+	cmp r2,#2
+	TurnLed #2, #0
+	TurnLed #3, #1
+	TurnLed #4, #0
+	TurnLed #17, #0
+	
+	cmp r2,#3
+	TurnLed #2, #1
+	TurnLed #3, #1
+	TurnLed #4, #0
+	TurnLed #17, #0
+	
+	cmp r2,#4
+	TurnLed #2, #0
+	TurnLed #3, #0
+	TurnLed #4, #1
+	TurnLed #17, #0
+	
+	cmp r2,#5
+	TurnLed #2, #1
+	TurnLed #3, #0
+	TurnLed #4, #1
+	TurnLed #17, #0
+	
+	cmp r2,#6
+	TurnLed #2, #0
+	TurnLed #3, #1
+	TurnLed #4, #1
+	TurnLed #17, #0
+	
+	cmp r2,#7
+	TurnLed #2, #1
+	TurnLed #3, #1
+	TurnLed #4, #1
+	TurnLed #17, #0
+	
+	cmp r2,#8
+	TurnLed #2, #0
+	TurnLed #3, #0
+	TurnLed #4, #0
+	TurnLed #17, #1
+	
+	cmp r2,#9
+	TurnLed #2, #1
+	TurnLed #3, #0
+	TurnLed #4, #0
+	TurnLed #17, #1
+	
+	pop {pc}
 	
 		
 .section .data
