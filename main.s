@@ -4,27 +4,27 @@ _start:
 
 b main
 
-.macro SetPin puerto, valor
+.macro SetPin puerto, valor   @asigna la funcion especificada por el programa al pin deseado 
 	mov r0, \puerto
 	mov r1, \valor
 	bl SetGpioFunction
 .endm
 
 
-.macro TurnLed puerto, valor
+.macro TurnLed puerto, valor   @recibe puerto y numero de led para encender un led deseado
 	mov r0, \puerto
 	mov r1, \valor
 	bl SetGpio
 .endm
 
-.macro TurnSpeaker puerto, valor
+.macro TurnSpeaker puerto, valor   @recibe puerto y el valor para hacer sonar la bocina 
 	mov r0, \puerto
 	mov r1, \valor
 	bl SetGpio
 .endm
 
 
-.macro stateButton puerto
+.macro stateButton puerto       @recibe el valor que esta indicando el boton, si esta presionado o no
 	ldr r5, [r4, #0x34]
 	mov r0, #1
 	lsl r0, \puerto
@@ -38,7 +38,7 @@ b main
 
 main:
 	mov sp, #0x8000
-
+				@se les asigna la funcion indicada a cada pin para ser salida o entrada (4 entradas 15 salidas)
 	SetPin #14, #0
 	SetPin #15, #0
 	SetPin #18, #0
@@ -65,10 +65,10 @@ main:
 	
 	mov r10, #0
 	
-	pruebaMacros:
+	pruebaMacros:   		  @inicia el ciclo donde se recorre todo el juego
 		bl nuevoNivel
 		
-		bl random
+		bl random		@se generan los randoms para la primer secuencia a mostrar 
 		mov r4, #0
 		bl comprobarRandom
 		
