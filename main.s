@@ -65,17 +65,16 @@ main:
 	
 	mov r10, #0
 	mov r11,#1
-	mov r3,#0
-	
-	pruebaMacros:
+	mov r3, #0
+	inicioSerie:
 	
 		bl nuevoNivel
 		bl displayTurn1
 		add r11, r11, #1
 		cmp r11, #10
 		moveq r11, #0
-		addeq r3, r3, #1
-		cmp r3, #10
+		bleq contadorSegment2
+		bl displayTurn2
 		
 		
 		bl random
@@ -137,7 +136,7 @@ main:
 				add r11, #1
 				cmp r11, #4
 				bne cicloPasarTurno
-				beq pruebaMacros
+				beq inicioSerie
 		
 
 	comprobarRandom:
@@ -390,8 +389,9 @@ main:
 		bl sound2
 		bl sound3
 		
-		bl numero1
-		b pruebaMacros
+		mov r11, #0
+		mov r3, #0
+		b inicioSerie
 		
 	nuevoNivel:
 		push {lr}
@@ -424,23 +424,23 @@ main:
 	
 	displayTurn1:
 		push {lr}
-		cmp r9,#1
+		cmp r11,#1
 		bleq numero1
-		cmp r9,#2
+		cmp r11,#2
 		beq numero2
-		cmp r9,#3
+		cmp r11,#3
 		beq numero3
-		cmp r9,#4
+		cmp r11,#4
 		beq numero4
-		cmp r9,#5
+		cmp r11,#5
 		beq numero5
-		cmp r9,#6
+		cmp r11,#6
 		beq numero6
-		cmp r9,#7
+		cmp r11,#7
 		beq numero7
-		cmp r9,#8
+		cmp r11,#8
 		beq numero8
-		cmp r9, #9
+		cmp r11, #9
 		beq numero9
 		pop {pc}
 		
@@ -593,6 +593,17 @@ main:
 		TurnLed #9, #1
 		pop {pc}
 		
+	contadorSegment2:
+		push {lr}
+		ldr r0, =segmento2
+		ldr r1, [r0]
+		add r1, r1, #1
+		cmp r1, #10
+		moveq r1, #0
+		str r1, [r0]
+		mov r3, r1
+		pop {pc}
+		
 .section .data
 .align 2
 
@@ -601,3 +612,6 @@ patronL:
 	
 patronB:
 	.word 0,0,0,0,0
+
+segmento2:
+	.word 0
