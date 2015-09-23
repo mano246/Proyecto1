@@ -4,26 +4,36 @@ _start:
 
 b main
 
+/*
+* Establece que el numero de pin ingresado, sera utilizado en el main.
+*/
 .macro SetPin puerto, valor
 	mov r0, \puerto
 	mov r1, \valor
 	bl SetGpioFunction
 .endm
 
-
+/*
+* Segun el numero ingresado de pin y la funcion (0 y 1) enciende o apaga el pin.
+*/
 .macro TurnLed puerto, valor
 	mov r0, \puerto
 	mov r1, \valor
 	bl SetGpio
 .endm
 
+/*
+* Segun el numero ingresado, es la frecuencia que la bocina va a hacer sonar.
+*/
 .macro TurnSpeaker puerto, valor
 	mov r0, \puerto
 	mov r1, \valor
 	bl SetGpio
 .endm
 
-
+/*
+* Comprueba que un boton sea presionado.
+*/
 .macro stateButton puerto
 	ldr r5, [r4, #0x34]
 	mov r0, #1
@@ -39,6 +49,7 @@ b main
 main:
 	mov sp, #0x8000
 
+	/*Se establecen los pines que se utilizaran*/
 	SetPin #14, #0
 	SetPin #15, #0
 	SetPin #18, #0
@@ -63,6 +74,7 @@ main:
 	SetPin #10, #1
 	SetPin #9, #1
 	
+	/*Contadores respectivos, para los displays y para un delay entre cada secuencia*/
 	mov r10, #0
 	mov r11,#1
 	mov r3, #0
@@ -71,7 +83,7 @@ main:
 		bl nuevoNivel
 		bl displayTurn1
 		add r11, r11, #1
-		cmp r11, #10
+		cmp r11, #10			/* Si el contador del segmento 1, llega a 10 quiere decir que hay que sumarle un 1 al segmento 2*/
 		moveq r11, #0
 		bleq contadorSegment2
 		bl displayTurn2
@@ -97,7 +109,7 @@ main:
 		mov r4, #16
 		bl comprobarRandom
 		
-		
+		/*Delay entre cada repeticion de la serie, esto es para no perder la aleatoriedad*/
 		add r10, #1
 		cmp r10, #2
 		ldreq r0, = 50000
@@ -128,6 +140,7 @@ main:
 			ldr r5, = patronL
 			ldr r8, = patronB
 			cicloPasarTurno: 
+			/* Comprueba que el boton presionado sea el que se debia para poder completar la secuencia correcta*/
 				ldr r6, [r5], #4
 				ldr r9, [r8], #4
 				cmp r6, r9
@@ -138,7 +151,10 @@ main:
 				bne cicloPasarTurno
 				beq inicioSerie
 		
-
+	/*
+	* Entrada: r0 = valor aleatorio generado por la subrutina random.
+	* Segun la entrada en r0, se crea un salto para poder hacer parpadear un LED.
+	*/
 	comprobarRandom:
 		push {lr}
 		cmp r0, #0
@@ -151,7 +167,10 @@ main:
 		bleq led4
 		pop {pc}
 		
-
+	/*
+	* Hace parpadear un LED, además guarda en el arreglo un numero segun el LED (1-4), en una posicion vacia, esto para despues comprobar que se presiono el boton adecuado.*/
+	* Esto aplica para las subrutinas led1, led2, led3 y led4
+	*/
 	led1:
 		push {lr}  /*r4 viene la posicion*/
 		
