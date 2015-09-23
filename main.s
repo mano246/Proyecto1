@@ -53,6 +53,16 @@ main:
 	SetPin #19, #1
 	SetPin #13, #1
 	
+	SetPin #2, #1
+	SetPin #3, #1
+	SetPin #4, #1
+	SetPin #17, #1
+	
+	SetPin #27, #1
+	SetPin #22, #1
+	SetPin #10, #1
+	SetPin #9, #1
+	
 	mov r10, #0
 	
 	pruebaMacros:
@@ -88,7 +98,7 @@ main:
 		ldreq r0, = 30000
 		bleq Wait
 		beq finTurno
-		movne r10, #0
+		moveq r10, #0
 		bne finTurno
 	
 		
@@ -119,17 +129,7 @@ main:
 				bne cicloPasarTurno
 				beq pruebaMacros
 		
-			
-	/*verificarPatron:
-	*	push {lr}		
-	*	ldr r6, [r5], #4
-	*	ldr r9, [r8], #4
-	*	cmp r6, r9
-	*	bleq led6
-	*	bne error
-	*	pop {pc}
-	*/
-	
+
 	comprobarRandom:
 		push {lr}
 		cmp r0, #0
@@ -379,6 +379,8 @@ main:
 		bl sound1
 		bl sound2
 		bl sound3
+		
+		bl numero1
 		b pruebaMacros
 		
 	nuevoNivel:
@@ -410,6 +412,93 @@ main:
 
 		pop {pc}
 	
+	displayScore1:
+		push {lr}
+		cmp r9,#1
+		bleq numero1
+		
+		cmp r9,#2
+		beq numero2
+		cmp r9,#3
+		beq numero3
+		cmp r9,#4
+		beq numero4
+		cmp r9,#5
+		beq numero5
+		cmp r9,#6
+		beq numero6
+		cmp r9,#7
+		beq numero7
+		cmp r9,#8
+		beq numero8
+		cmp r9, #9
+		beq numero9
+		pop {pc}
+		
+	numero1:
+		push {lr}
+		TurnLed #2, #1
+		TurnLed #3, #0
+		TurnLed #4, #0
+		TurnLed #17, #0
+		pop {pc}
+	numero2:
+		push {lr}
+		TurnLed #2, #0
+		TurnLed #3, #1
+		TurnLed #4, #0
+		TurnLed #17, #0
+		pop {pc}
+
+	numero3: 
+		push {lr}
+		TurnLed #2, #1
+		TurnLed #3, #1
+		TurnLed #4, #0
+		TurnLed #17, #0
+		pop {pc}
+	numero4:
+		push {lr}
+		TurnLed #2, #0
+		TurnLed #3, #0
+		TurnLed #4, #1
+		TurnLed #17, #0
+		pop {pc}
+	numero5:
+		push {lr}
+		TurnLed #2, #1
+		TurnLed #3, #0
+		TurnLed #4, #1
+		TurnLed #17, #0
+		pop {pc}
+	numero6:
+		push {lr}
+		TurnLed #2, #0
+		TurnLed #3, #1
+		TurnLed #4, #1
+		TurnLed #17, #0
+		pop {pc}
+	numero7:
+		push {lr}
+		TurnLed #2, #1
+		TurnLed #3, #1
+		TurnLed #4, #1
+		TurnLed #17, #0
+		pop {pc}
+	numero8:
+		push {lr}
+		TurnLed #2, #0
+		TurnLed #3, #0
+		TurnLed #4, #0
+		TurnLed #17, #1
+		pop {pc}
+	numero9:
+		push {lr}
+		TurnLed #2, #1
+		TurnLed #3, #0
+		TurnLed #4, #0
+		TurnLed #17, #1
+		pop {pc}
 		
 .section .data
 .align 2
