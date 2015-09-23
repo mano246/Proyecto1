@@ -248,7 +248,9 @@ main:
 		ldr r0, = 500000
 		bl Wait
 		pop {pc}
-	
+	/*
+	*ingresa un valor especifico de frecuencia para cada sonido y su duracion especifica 
+	*/
 	sound1: 
 		push {lr}
 		TurnSpeaker #13, #1
@@ -316,7 +318,9 @@ main:
 		ble	sound4
 		mov r5,#0
 		pop {pc}
-		
+	/*
+	*ciclo que guarda los valores generados al azar para una lista de la secuencia
+	*/
 	storeListL:
 		push {lr}
 		mov r5, r4
@@ -324,6 +328,9 @@ main:
 		str r6, [r0], r5
 		pop {pc}
 	
+	/*
+	*ciclo que guarda en el arreglo especifico el valor correspondiente a cada boton
+	*/
 	storeListButton: /* Entrada: r6 = pin, r5= numero de posicion*/
 		push {lr}
 		ldr r0, = patronB
@@ -335,13 +342,17 @@ main:
 		storeListB:
 			str r6, [r0]
 			pop {pc}
-		
+	/*
+	*genera random de 0-3
+	*/
 	random:
 		push {lr}
 		bl GetTimeStamp
 		and r0, #3		
 		pop {pc}
-			
+	/*
+	*recibe el boton presionado y lo guarda en su arreglo especifico
+	*/
 	
 	comprobarBoton:
 		push {lr}
@@ -375,7 +386,9 @@ main:
 		bleq storeListButton 
 		bleq led5	
 		pop {pc}
-		
+	/*
+	*despliega la secuencia de leds para indicar el cambio de nivel
+	*/
 	error:
 		TurnLed #21, #1
 		TurnLed #20, #1
@@ -411,7 +424,9 @@ main:
 		mov r11, #0
 		mov r3, #0
 		b inicioSerie
-		
+	/*
+	*despliega la secuencia de leds para indicar el cambio de nivel
+	*/
 	nuevoNivel:
 		push {lr}
 		TurnLed #21, #1
@@ -440,7 +455,10 @@ main:
 		bl Wait
 
 		pop {pc}
-	
+	/*
+	*Entrada: r3 contador de turno
+ 	*compara contadores para evaluar  en que nivel se encuentra el juego
+	*/
 	displayTurn1:
 		push {lr}
 		cmp r11,#1
@@ -484,7 +502,9 @@ main:
 		cmp r3, #9
 		beq numero99
 		pop {pc}
-		
+	/*
+	*combinacio de salidas especificas para desplegar los numeros del nivel correspondiente al nivel
+	*/
 	numero1:
 		push {lr}
 		TurnLed #2, #1
@@ -611,7 +631,11 @@ main:
 		TurnLed #10, #0
 		TurnLed #9, #1
 		pop {pc}
-		
+	/*
+ 	*Entrada: r3 cuenta 
+	*Salida: r3 valor
+ 	*crea un espacio para llevar la cuenta del display2 
+ 	*/
 	contadorSegment2:
 		push {lr}
 		ldr r0, =segmento2
