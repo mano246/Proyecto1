@@ -129,7 +129,7 @@ main:
 				bne cicloPasarTurno
 				beq pruebaMacros
 		
-
+				@comprueba que el random generado no este fuera de los limites (0-3)
 	comprobarRandom:
 		push {lr}
 		cmp r0, #0
@@ -142,16 +142,16 @@ main:
 		bleq led4
 		pop {pc}
 		
-
+		@subrutinas que se llaman para encender los leds correspondientes y agregar su valor correspondiente al vector de leds a mostrar
 	led1:
 		push {lr}  /*r4 viene la posicion*/
 		
 		mov r6, #1
-		bl storeListL
+		bl storeListL		@se guarda
 		
 		TurnLed #21, #1
 		bl sound1
-		ldr r0, = 500000
+		ldr r0, = 500000	@se enciende led y suena bocina
 		bl Wait
 		TurnLed #21, #0
 		ldr r0, = 500000
@@ -221,10 +221,11 @@ main:
 		bl Wait
 		pop {pc}
 	
+		@subrutinas para presentar sonidos para situaciones especificadas
 	sound1: 
 		push {lr}
 		TurnSpeaker #13, #1
-		ldr r0, = 1911
+		ldr r0, = 1911			@se enciende y apaga a frecuencia que crea una nota especifica
 		bl Wait
 		
 		TurnSpeaker #13, #0
@@ -232,7 +233,7 @@ main:
 		bl Wait
 		
 		add r5, #1
-		ldr r6, =75
+		ldr r6, =75			@se le da un delay o wait para generar una nota sostenida
 		cmp r5, r6
 		ble	sound1
 		mov r5,#0
@@ -289,41 +290,45 @@ main:
 		mov r5,#0
 		pop {pc}
 		
+		@subrutina donde se almacena la secuencia generada al azar de los leds		
 	storeListL:
 		push {lr}
 		mov r5, r4
-		ldr r0, = patronL
+		ldr r0, = patronL    @patron de leds
 		str r6, [r0], r5
 		pop {pc}
-	
+		
+		@subrutina que almacena en cada espacio del vector asignado el numero de boton correspondiente a cada led ingresado para comparar si es igual a la secuencia presentada
 	storeListButton: /* Entrada: r6 = pin, r5= numero de posicion*/
 		push {lr}
-		ldr r0, = patronB
+		ldr r0, = patronB			@patron de botones
 		inicioStoreListButton:
 			ldr r1, [r0], #4			/*llegar al final del arreglo, y comparar*/
 			cmp r1, #0 
 			bne inicioStoreListButton
-			beq storeListB
+			beq storeListB				
 		storeListB:
 			str r6, [r0]
 			pop {pc}
 		
+		@subrutina que genera numeros randoms de 0-3 para la secuencia de leds presentada en el juego
 	random:
 		push {lr}
 		bl GetTimeStamp
 		and r0, #3		
 		pop {pc}
 			
+		@subrutina que lee cual de los botones fue presionado y asi mismo lo guarda en su vector determinado
 	
 	comprobarBoton:
 		push {lr}
-		bl GetGpioAddress
+		bl GetGpioAddress	@se obtiene gpio del boton
 		mov r4, r0
 		stateButton #15
-		cmp r0, #1
+		cmp r0, #1		@verifica presionado
 		bleq led1
 		moveq r6, #1
-		bleq storeListButton 
+		bleq storeListButton 	@guarda si presionado
 		bleq led5
 		
 		stateButton #14
@@ -348,6 +353,7 @@ main:
 		bleq led5	
 		pop {pc}
 		
+		@secuencia de leds que indica cuando se encuentra un error al comparar la secuencia dada y la secuencia ingresada
 	error:
 		TurnLed #21, #1
 		TurnLed #20, #1
@@ -383,6 +389,7 @@ main:
 		bl numero1
 		b pruebaMacros
 		
+		@secuencia de leds que indica cuando se inicia un nuevo nivel 
 	nuevoNivel:
 		push {lr}
 		TurnLed #21, #1
@@ -412,6 +419,8 @@ main:
 
 		pop {pc}
 	
+	@subrutina que compara en que nivel del juego se encuentra un jugador
+	
 	displayScore1:
 		push {lr}
 		cmp r9,#1
@@ -435,6 +444,7 @@ main:
 		beq numero9
 		pop {pc}
 		
+			@serie de pines correspondientes a cada numero de los displays para encenderse indicando el nivel en el quee se encuentran
 	numero1:
 		push {lr}
 		TurnLed #2, #1
