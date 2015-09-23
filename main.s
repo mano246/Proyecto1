@@ -4,27 +4,27 @@ _start:
 
 b main
 
-.macro SetPin puerto, valor   @asigna la funcion especificada por el programa al pin deseado 
+.macro SetPin puerto, valor
 	mov r0, \puerto
 	mov r1, \valor
 	bl SetGpioFunction
 .endm
 
 
-.macro TurnLed puerto, valor   @recibe puerto y numero de led para encender un led deseado
+.macro TurnLed puerto, valor
 	mov r0, \puerto
 	mov r1, \valor
 	bl SetGpio
 .endm
 
-.macro TurnSpeaker puerto, valor   @recibe puerto y el valor para hacer sonar la bocina 
+.macro TurnSpeaker puerto, valor
 	mov r0, \puerto
 	mov r1, \valor
 	bl SetGpio
 .endm
 
 
-.macro stateButton puerto       @recibe el valor que esta indicando el boton, si esta presionado o no
+.macro stateButton puerto
 	ldr r5, [r4, #0x34]
 	mov r0, #1
 	lsl r0, \puerto
@@ -38,7 +38,7 @@ b main
 
 main:
 	mov sp, #0x8000
-				@se les asigna la funcion indicada a cada pin para ser salida o entrada (4 entradas 15 salidas)
+
 	SetPin #14, #0
 	SetPin #15, #0
 	SetPin #18, #0
@@ -64,11 +64,21 @@ main:
 	SetPin #9, #1
 	
 	mov r10, #0
+	mov r11,#1
+	mov r3,#0
 	
-	pruebaMacros:   		  @inicia el ciclo donde se recorre todo el juego
+	pruebaMacros:
+	
 		bl nuevoNivel
+		bl displayTurn1
+		add r11, r11, #1
+		cmp r11, #10
+		moveq r11, #0
+		addeq r3, r3, #1
+		cmp r3, #10
 		
-		bl random		@se generan los randoms para la primer secuencia a mostrar 
+		
+		bl random
 		mov r4, #0
 		bl comprobarRandom
 		
@@ -114,7 +124,7 @@ main:
 				bne ciclo
 				moveq r11, #0
 				beq pasarTurno
-		
+
 		pasarTurno:
 			ldr r5, = patronL
 			ldr r8, = patronB
@@ -129,7 +139,7 @@ main:
 				bne cicloPasarTurno
 				beq pruebaMacros
 		
-				@comprueba que el random generado no este fuera de los limites (0-3)
+
 	comprobarRandom:
 		push {lr}
 		cmp r0, #0
@@ -142,16 +152,16 @@ main:
 		bleq led4
 		pop {pc}
 		
-		@subrutinas que se llaman para encender los leds correspondientes y agregar su valor correspondiente al vector de leds a mostrar
+
 	led1:
 		push {lr}  /*r4 viene la posicion*/
 		
 		mov r6, #1
-		bl storeListL		@se guarda
+		bl storeListL
 		
 		TurnLed #21, #1
 		bl sound1
-		ldr r0, = 500000	@se enciende led y suena bocina
+		ldr r0, = 500000
 		bl Wait
 		TurnLed #21, #0
 		ldr r0, = 500000
@@ -221,11 +231,10 @@ main:
 		bl Wait
 		pop {pc}
 	
-		@subrutinas para presentar sonidos para situaciones especificadas
 	sound1: 
 		push {lr}
 		TurnSpeaker #13, #1
-		ldr r0, = 1911			@se enciende y apaga a frecuencia que crea una nota especifica
+		ldr r0, = 1911
 		bl Wait
 		
 		TurnSpeaker #13, #0
@@ -233,7 +242,7 @@ main:
 		bl Wait
 		
 		add r5, #1
-		ldr r6, =75			@se le da un delay o wait para generar una nota sostenida
+		ldr r6, =75
 		cmp r5, r6
 		ble	sound1
 		mov r5,#0
@@ -290,45 +299,41 @@ main:
 		mov r5,#0
 		pop {pc}
 		
-		@subrutina donde se almacena la secuencia generada al azar de los leds		
 	storeListL:
 		push {lr}
 		mov r5, r4
-		ldr r0, = patronL    @patron de leds
+		ldr r0, = patronL
 		str r6, [r0], r5
 		pop {pc}
-		
-		@subrutina que almacena en cada espacio del vector asignado el numero de boton correspondiente a cada led ingresado para comparar si es igual a la secuencia presentada
+	
 	storeListButton: /* Entrada: r6 = pin, r5= numero de posicion*/
 		push {lr}
-		ldr r0, = patronB			@patron de botones
+		ldr r0, = patronB
 		inicioStoreListButton:
 			ldr r1, [r0], #4			/*llegar al final del arreglo, y comparar*/
 			cmp r1, #0 
 			bne inicioStoreListButton
-			beq storeListB				
+			beq storeListB
 		storeListB:
 			str r6, [r0]
 			pop {pc}
 		
-		@subrutina que genera numeros randoms de 0-3 para la secuencia de leds presentada en el juego
 	random:
 		push {lr}
 		bl GetTimeStamp
 		and r0, #3		
 		pop {pc}
 			
-		@subrutina que lee cual de los botones fue presionado y asi mismo lo guarda en su vector determinado
 	
 	comprobarBoton:
 		push {lr}
-		bl GetGpioAddress	@se obtiene gpio del boton
+		bl GetGpioAddress
 		mov r4, r0
 		stateButton #15
-		cmp r0, #1		@verifica presionado
+		cmp r0, #1
 		bleq led1
 		moveq r6, #1
-		bleq storeListButton 	@guarda si presionado
+		bleq storeListButton 
 		bleq led5
 		
 		stateButton #14
@@ -353,7 +358,6 @@ main:
 		bleq led5	
 		pop {pc}
 		
-		@secuencia de leds que indica cuando se encuentra un error al comparar la secuencia dada y la secuencia ingresada
 	error:
 		TurnLed #21, #1
 		TurnLed #20, #1
@@ -389,7 +393,6 @@ main:
 		bl numero1
 		b pruebaMacros
 		
-		@secuencia de leds que indica cuando se inicia un nuevo nivel 
 	nuevoNivel:
 		push {lr}
 		TurnLed #21, #1
@@ -419,13 +422,10 @@ main:
 
 		pop {pc}
 	
-	@subrutina que compara en que nivel del juego se encuentra un jugador
-	
-	displayScore1:
+	displayTurn1:
 		push {lr}
 		cmp r9,#1
 		bleq numero1
-		
 		cmp r9,#2
 		beq numero2
 		cmp r9,#3
@@ -444,13 +444,41 @@ main:
 		beq numero9
 		pop {pc}
 		
-			@serie de pines correspondientes a cada numero de los displays para encenderse indicando el nivel en el quee se encuentran
+	displayTurn2:
+		push {lr}
+		cmp r3,#1
+		bleq numero11
+		cmp r3,#2
+		beq numero22
+		cmp r3,#3
+		beq numero33
+		cmp r3,#4
+		beq numero44
+		cmp r3,#5
+		beq numero55
+		cmp r3,#6
+		beq numero66
+		cmp r3,#7
+		beq numero77
+		cmp r3,#8
+		beq numero88
+		cmp r3, #9
+		beq numero99
+		pop {pc}
+		
 	numero1:
 		push {lr}
 		TurnLed #2, #1
 		TurnLed #3, #0
 		TurnLed #4, #0
 		TurnLed #17, #0
+		pop {pc}
+	numero11:
+		push {lr}
+		TurnLed #27, #1
+		TurnLed #22, #0
+		TurnLed #10, #0
+		TurnLed #9, #0
 		pop {pc}
 	numero2:
 		push {lr}
@@ -459,13 +487,26 @@ main:
 		TurnLed #4, #0
 		TurnLed #17, #0
 		pop {pc}
-
+	numero22:
+		push {lr}
+		TurnLed #27, #0
+		TurnLed #22, #1
+		TurnLed #10, #0
+		TurnLed #9, #0
+		pop {pc}
 	numero3: 
 		push {lr}
 		TurnLed #2, #1
 		TurnLed #3, #1
 		TurnLed #4, #0
 		TurnLed #17, #0
+		pop {pc}
+	numero33: 
+		push {lr}
+		TurnLed #27, #1
+		TurnLed #22, #1
+		TurnLed #10, #0
+		TurnLed #9, #0
 		pop {pc}
 	numero4:
 		push {lr}
@@ -474,12 +515,26 @@ main:
 		TurnLed #4, #1
 		TurnLed #17, #0
 		pop {pc}
+	numero44:
+		push {lr}
+		TurnLed #27, #0
+		TurnLed #22, #0
+		TurnLed #10, #1
+		TurnLed #9, #0
+		pop {pc}
 	numero5:
 		push {lr}
 		TurnLed #2, #1
 		TurnLed #3, #0
 		TurnLed #4, #1
 		TurnLed #17, #0
+		pop {pc}
+	numero55:
+		push {lr}
+		TurnLed #27, #1
+		TurnLed #22, #0
+		TurnLed #10, #1
+		TurnLed #9, #0
 		pop {pc}
 	numero6:
 		push {lr}
@@ -488,12 +543,26 @@ main:
 		TurnLed #4, #1
 		TurnLed #17, #0
 		pop {pc}
+	numero66:
+		push {lr}
+		TurnLed #27, #0
+		TurnLed #22, #1
+		TurnLed #10, #1
+		TurnLed #9, #0
+		pop {pc}
 	numero7:
 		push {lr}
 		TurnLed #2, #1
 		TurnLed #3, #1
 		TurnLed #4, #1
 		TurnLed #17, #0
+		pop {pc}
+	numero77:
+		push {lr}
+		TurnLed #27, #1
+		TurnLed #22, #1
+		TurnLed #10, #1
+		TurnLed #9, #0
 		pop {pc}
 	numero8:
 		push {lr}
@@ -502,12 +571,26 @@ main:
 		TurnLed #4, #0
 		TurnLed #17, #1
 		pop {pc}
+	numero88:
+		push {lr}
+		TurnLed #27, #0
+		TurnLed #22, #0
+		TurnLed #10, #0
+		TurnLed #9, #1
+		pop {pc}
 	numero9:
 		push {lr}
 		TurnLed #2, #1
 		TurnLed #3, #0
 		TurnLed #4, #0
 		TurnLed #17, #1
+		pop {pc}
+	numero99:
+		push {lr}
+		TurnLed #27, #1
+		TurnLed #22, #0
+		TurnLed #10, #0
+		TurnLed #9, #1
 		pop {pc}
 		
 .section .data
