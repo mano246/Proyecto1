@@ -1,0 +1,63 @@
+
+
+GuardarRand:
+		push {lr}
+		
+		mov r2, r0		/*aqui paso el random a r2, porque si no se pierde*/
+		
+		cmp #contador,#1		/*que num de random voy? necesitamos un contador para eso*/
+		beq ldr r0, =rand1
+		
+		cmp #contador,#2
+		beq ldr r0, =rand2		/*saco el espacio de memoria del random que me toca*/
+		
+		cmp #contador,#3
+		beq ldr r0, =rand3
+		
+		cmp #contador,#4
+		beq ldr r0, =rand4
+		
+		cmp #contador,#5
+		beq ldr r0, =rand5
+		
+		
+		/* ldr r1, [r0] @esto no se hace....?*/
+		ldr r1, [r0]		/*lo cargo en r1*/
+		mov r1, r2			/*paso el rando a r1*/
+		str r1, [r0]		/*guardo el r1 (random) de nuevo*/
+		
+		add #contador, #1
+		cmp #contador, #6
+		moveq #contador,#1
+		
+		pop {pc}
+		
+GuardarBoton:
+		push {lr}
+		
+		mov r2, r0		/*aqui paso el num ingresado a r2, porque si no se pierde (le mandamos un num de 0-3 y ya solo hay que compararlos)*/
+		
+		cmp #contador,#1		/*que num de boton voy*/
+		beq ldr r0, =bot1
+		
+		cmp #contador,#2
+		beq ldr r0, =bot2		/*saco el espacio de memoria del num de boton que me toca*/
+		
+		cmp #contador,#3
+		beq ldr r0, =bot3
+		
+		cmp #contador,#4
+		beq ldr r0, =bot4
+		
+		cmp #contador,#5
+		beq ldr r0, =bot5
+		
+		ldr r1, [r0]		/*lo cargo en r1*/
+		mov r1, r2			/*paso el num de boton a r1*/
+		str r1, [r0]		/*guardo el r1 (num boton) de nuevo*/
+		
+		add #contador, #1
+		cmp #contador, #6
+		moveq #contador,#1
+		
+		pop {pc}
